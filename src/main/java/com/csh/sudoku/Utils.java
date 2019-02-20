@@ -42,6 +42,7 @@ public class Utils {
         }
         row = getStartNum(row);
         col = getStartNum(col);
+        //System.out.println("start row and col:"+row+","+col);
         List<Integer> tmp = new ArrayList<>();
         for (int i = 0; i < NUMAREA3; i++) {
             for (int j = 0; j < NUMAREA3; j++) {
@@ -58,12 +59,33 @@ public class Utils {
 
     public static int getStartNum(int num){
         double flag = num/3.0;
-        if (flag <= NUMAREA1){
+        if (flag < NUMAREA1){
             return 0;
-        }else if (flag > NUMAREA1 && flag <= NUMAREA2){
+        }else if (flag >= NUMAREA1 && flag < NUMAREA2){
             return 3;
         }else {
             return 6;
+        }
+    }
+
+    public static List<Integer> getDefectNum(int[][] table, int row, int col){
+        List<Integer> rowNums = getRCDefectNum(table, row, true);
+        List<Integer> colNums = getRCDefectNum(table, col, false);
+        List<Integer> areaNums = getAreaDefectNum(table, row, col);
+        rowNums.retainAll(colNums);
+        rowNums.retainAll(areaNums);
+        return rowNums;
+    }
+
+    public static void printTable(int[][] table){
+        for (int i = 0; i < RCNUM; i++) {
+            for (int j = 0; j < RCNUM; j++) {
+                System.out.print(table[i][j]);
+                if (j<8) {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println();
         }
     }
 
@@ -79,14 +101,25 @@ public class Utils {
             }
         }
         System.out.println(Arrays.deepToString(table));
-        System.out.println(getAreaDefectNum(table,0,0));
-        List<Integer> rcDefectNum = getRCDefectNum(table, 0, true);
-        List<Integer> rcDefectNum1 = getRCDefectNum(table, 0, false);
-        System.out.println(rcDefectNum);
-        System.out.println(rcDefectNum1);
-        rcDefectNum.retainAll(rcDefectNum1);
-        System.out.println(rcDefectNum);
-
+        List<Integer> flagList = new ArrayList<>();
+        flagList.add(0);
+        while(flagList.contains(0)){
+            flagList.clear();
+            for (int i = 0; i < RCNUM; i++) {
+                for (int j = 0; j < RCNUM; j++) {
+                    if (table[i][j] == 0){
+                        List<Integer> defectNum = getDefectNum(table, i, j);
+                        System.out.println(i+","+j+":"+defectNum);
+                        if (defectNum.size() == 1){
+                            table[i][j] = defectNum.get(0);
+                        }
+                    }
+                    flagList.add(table[i][j]);
+                }
+            }
+            System.out.println(flagList);
+            printTable(table);
+        }
     }
 
 }
